@@ -24,6 +24,9 @@ dnfsc_sc <-function(X, K.cand = 1:10) {
   n <- nrow(X)
   p <- ncol(X)
 
+  #n_split: number of splits.
+  n_split = 10
+
   #Get first terms of SC1, SC2 and SC3.
   #c_values for SC1 using deterministic c_k
   c_values <- 1 - K.cand/length(K.cand)
@@ -34,26 +37,29 @@ dnfsc_sc <-function(X, K.cand = 1:10) {
   #fit_SC3: First term of SC3
   fit_SC3 <- Get_fit_SC3.func(X,K.cand,p,n)
   #=======================================================================================
-  #instability: vector storing the instability
-  instability <- rep(0,length(K.cand))
+  #instability: matrix storing the instability
+  instab_mat <- matrix(0, nrow = n_split, ncol = length(K.cand))
 
-  #Split the data in half to compute stability measure
-  X1_ind <- sample(1:n, round(n/2),  replace = FALSE)
-  X1 <- X[X1_ind,]
-  X2 <- X[setdiff(1:n, X1_ind), ]
+  #Splitting procedure
+  for( s in 1:n_split){
+    #Split the data in half to compute stability measure
+    X1_ind <- sample(1:n, round(n/2),  replace = FALSE)
+    X1 <- X[X1_ind,]
+    X2 <- X[setdiff(1:n, X1_ind), ]
 
 
-  #Perform SVD to X1 and X2
-  #Svd to X1/sqrt{p*n} to get \tilde{v}_j. Scaled by sqrt(p*n) to ensure numerical stability.
-  svd_1 = svd(X1/sqrt(p*n))
-  svd_2 = svd(X2/sqrt(p*n))
+    #Perform SVD to X1 and X2
+    #Svd to X1/sqrt{p*n} to get \tilde{v}_j. Scaled by sqrt(p*n) to ensure numerical stability.
+    svd_1 = svd(X1/sqrt(p*n))
+    svd_2 = svd(X2/sqrt(p*n))
 
-  #Compute stability measure
-  for ( i in 1:length(K.cand)){
-    k = K.cand[i]
-    instability[i]<- subspace(svd_1$v[,1:k],svd_2$v[,1:k])
+    #Compute stability measure
+    for ( i in 1:length(K.cand)){
+      k = K.cand[i]
+      instab_mat[s,i]<- subspace(svd_1$v[,1:k],svd_2$v[,1:k])
+    }
   }
-
+  instability <- colMeans(instab_mat)
   #Compute SC1, SC2 and SC3
   SC1<- c_values + instability
   SC2 <- fit_SC2 + instability
