@@ -3,8 +3,9 @@
 #' This is the core function of the package. It computes the stability-based criteria—SC1, SC2, and SC3—and provides corresponding estimates for the number of factors, as outlined in Lee & Chen (2024+).
 #'
 #'
-#' @param X \eqn{n \times p} data matrix
-#' @param K.cand Candidate set for the number of factors. Default is set at 1:10.
+#' @param X A numeric data matrix matrix of dimensions \eqn{n \times p}.
+#' @param K.cand An integer vector specifying the candidate set for the number of factors to be evaluated. The default is \code{1:10}.
+#' @param averaging A logical parameter indicating whether to perform multiple data splits and average the resulting instability measures. If \code{TRUE} (default), the function conducts multiple splits.
 #' @return A list containing the results of the estimation, including:
 #' \item{SC1}{Computed values of SC1 for each value in \code{K.cand}.}
 #' \item{SC2}{Computed values of SC2 for each value in \code{K.cand}.}
@@ -17,15 +18,20 @@
 #' # Generate example dataset
 #' set.seed(123)
 #' X <- example_data.func(scenario =1, signal = 1, n = 1500, p=500)
-#' result <- dnfsc_sc(X, K.cand = 1:10)
+#' result <- dnfsc_sc(X, K.cand = 1:10,averaging = TRUE )
 #' @export
-dnfsc_sc <-function(X, K.cand = 1:10) {
+dnfsc_sc <-function(X, K.cand = 1:10, averaging = TRUE) {
   #Get n and p.
   n <- nrow(X)
   p <- ncol(X)
 
   #n_split: number of splits.
-  n_split = 10
+  if(averaging==TRUE){
+    n_split = 10
+  }else{
+    n_split = 1
+  }
+
 
   #Get first terms of SC1, SC2 and SC3.
   #c_values for SC1 using deterministic c_k

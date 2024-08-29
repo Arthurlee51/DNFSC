@@ -4,12 +4,14 @@
 \alias{dnfsc_sc}
 \title{Stability-Based Factor Number Estimation}
 \usage{
-dnfsc_sc(X, K.cand = 1:10)
+dnfsc_sc(X, K.cand = 1:10, averaging = TRUE)
 }
 \arguments{
-\item{X}{\eqn{n \times p} data matrix}
+\item{X}{A numeric data matrix matrix of dimensions \eqn{n \times p}.}
 
-\item{K.cand}{Candidate set for the number of factors. Default is set at 1:10.}
+\item{K.cand}{An integer vector specifying the candidate set for the number of factors to be evaluated. The default is \code{1:10}.}
+
+\item{averaging}{A logical parameter indicating whether to perform multiple data splits and average the resulting instability measures. If \code{TRUE} (default), the function conducts multiple splits.}
 }
 \value{
 A list containing the results of the estimation, including:
@@ -28,5 +30,5 @@ This is the core function of the package. It computes the stability-based criter
 # Generate example dataset
 set.seed(123)
 X <- example_data.func(scenario =1, signal = 1, n = 1500, p=500)
-result <- dnfsc_sc(X, K.cand = 1:10)
+result <- dnfsc_sc(X, K.cand = 1:10,averaging = TRUE )
 }
